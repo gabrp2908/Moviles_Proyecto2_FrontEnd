@@ -1,0 +1,7 @@
+{
+  "name": "ColapsoGame",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
