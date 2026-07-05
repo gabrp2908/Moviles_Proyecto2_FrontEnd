@@ -1,7 +1,7 @@
 {
-  "name": "ColapsoGame",
+  "name": "temp_ionic",
   "integrations": {
     "capacitor": {}
   },
-  "type": "angular-standalone"
+  "type": "angular"
 }
