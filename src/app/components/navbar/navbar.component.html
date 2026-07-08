@@ -1,0 +1,52 @@
+<header class="sticky top-0 z-40 border-b border-white/10 bg-black/50 backdrop-blur-xl">
+  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+    <a routerLink="/" class="flex items-center gap-2 no-underline">
+      <img
+        src="/assets/junimo.png"
+        alt="Logo de la aplicación"
+        class="h-9 w-9 rounded-lg object-cover drop-shadow-[0_0_3px_rgba(255,255,255,0.8)]"
+      />
+      <span class="text-lg font-extrabold tracking-tight text-primary">
+        ColapsoGame
+      </span>
+    </a>
+
+    <nav class="flex items-center gap-2">
+      @if (user?.role === 'Admin') {
+        <a routerLink="/admin" class="flex items-center gap-1 px-3 py-1.5 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md no-underline text-foreground">
+          <lucide-icon name="shield" class="h-4 w-4"></lucide-icon> Admin
+        </a>
+      }
+      
+      @if (user) {
+        <div class="relative">
+          <button 
+            (click)="toggleMenu()"
+            class="flex items-center gap-1 px-3 py-1.5 text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md"
+          >
+            <lucide-icon name="user" class="h-4 w-4"></lucide-icon>
+            {{ user.user_na }}
+          </button>
+          
+          @if (isMenuOpen) {
+            <div class="absolute right-0 top-full mt-2 w-48 rounded-md border border-border bg-popover p-1 shadow-md text-popover-foreground">
+              <div class="flex flex-col px-2 py-1.5">
+                <span class="text-sm font-medium">{{ user.user_mail }}</span>
+                <span class="text-xs text-muted-foreground">Rol: {{ user.role }}</span>
+              </div>
+              <div class="h-px bg-border my-1"></div>
+              <a routerLink="/profile" (click)="closeMenu()" class="block w-full text-left px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground rounded-sm no-underline cursor-pointer">Mi perfil</a>
+              <button (click)="handleLogout()" class="block w-full text-left px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground rounded-sm cursor-pointer border-none bg-transparent text-foreground">
+                Cerrar sesión
+              </button>
+            </div>
+          }
+        </div>
+      } @else {
+        <a routerLink="/login" class="px-3 py-1.5 text-sm font-medium bg-gradient-brand text-white hover:opacity-90 rounded-md no-underline">
+          Iniciar sesión
+        </a>
+      }
+    </nav>
+  </div>
+</header>
