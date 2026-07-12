@@ -1,0 +1,75 @@
+<div class="mx-auto max-w-4xl px-4 py-8">
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight">Panel de Administración</h1>
+      <p class="mt-2 text-muted-foreground">Gestiona los roles de los usuarios del sistema.</p>
+    </div>
+    <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+      <lucide-icon name="shield" class="h-6 w-6"></lucide-icon>
+    </div>
+  </div>
+
+  <div class="mb-8 rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <h2 class="mb-4 text-lg font-semibold">Buscar Usuario</h2>
+    <div class="flex gap-4">
+      <input
+        type="email"
+        [(ngModel)]="searchEmail"
+        placeholder="Correo electrónico del usuario..."
+        class="flex h-10 flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        (keyup.enter)="handleSearch()"
+      />
+      <button
+        (click)="handleSearch()"
+        [disabled]="isSearching || !searchEmail"
+        class="inline-flex items-center justify-center rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground hover:bg-secondary/80 disabled:opacity-50 border-none"
+      >
+        <lucide-icon name="search" class="mr-2 h-4 w-4"></lucide-icon>
+        {{ isSearching ? 'Buscando...' : 'Buscar' }}
+      </button>
+    </div>
+    
+    @if (error) {
+      <p class="mt-2 text-sm text-destructive">{{ error }}</p>
+    }
+  </div>
+
+  @if (foundUser) {
+    <div class="rounded-2xl border border-border bg-card p-6 shadow-sm">
+      <div class="mb-6 flex items-start justify-between">
+        <div>
+          <h3 class="text-xl font-bold">{{ foundUser.user_na }}</h3>
+          <p class="text-sm text-muted-foreground">{{ foundUser.user_mail }}</p>
+        </div>
+        <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold text-primary">
+          Rol actual: {{ foundUser.role }}
+        </div>
+      </div>
+
+      <div class="space-y-4">
+        <label class="block text-sm font-medium">Asignar nuevo rol</label>
+        <div class="flex gap-4">
+          <select 
+            [(ngModel)]="selectedRole"
+            class="form-select max-w-xs h-10"
+          >
+            <option value="User">Usuario Estándar</option>
+            <option value="Critic">Crítico</option>
+            <option value="Admin">Administrador</option>
+          </select>
+          <button
+            (click)="handleUpdateRole()"
+            [disabled]="isUpdating || selectedRole === foundUser.role"
+            class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 border-none"
+          >
+            {{ isUpdating ? 'Actualizando...' : 'Actualizar Rol' }}
+          </button>
+        </div>
+        
+        @if (successMessage) {
+          <p class="text-sm text-green-500">{{ successMessage }}</p>
+        }
+      </div>
+    </div>
+  }
+</div>

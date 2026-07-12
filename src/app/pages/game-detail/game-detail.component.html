@@ -1,0 +1,185 @@
+<div class="mx-auto max-w-5xl px-4 py-8">
+  <a routerLink="/" class="mb-4 inline-flex items-center text-sm text-muted-foreground hover:text-foreground no-underline">
+    <lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon> Volver
+  </a>
+
+  @if (isLoading) {
+    <div class="mx-auto max-w-5xl px-4 py-8">
+      <div class="h-96 w-full rounded-2xl bg-muted animate-pulse"></div>
+    </div>
+  } @else if (isError) {
+    <div class="mx-auto max-w-5xl px-4 py-16 text-center">
+      <p class="text-muted-foreground">{{ errorMsg }}</p>
+      <a routerLink="/" class="mt-4 inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground no-underline text-foreground">
+        Volver al inicio
+      </a>
+    </div>
+  } @else if (game) {
+    <div class="grid gap-6 md:grid-cols-[280px_1fr]">
+      <div>
+        <div class="overflow-hidden rounded-2xl border border-border bg-muted">
+          @if (game.caratula) {
+            <img [src]="game.caratula" [alt]="game.nombre" class="w-full object-cover" />
+          } @else {
+            <div class="flex aspect-[3/4] items-center justify-center text-muted-foreground">
+              Sin carátula
+            </div>
+          }
+        </div>
+        <div class="mt-4 flex justify-around rounded-xl border border-border bg-card p-4">
+          <app-score-badge [score]="game.promedio_puntuacion_usuarios" label="Usuarios" size="lg"></app-score-badge>
+          <app-score-badge [score]="game.promedio_puntuacion_criticos" label="Críticos" variant="critic" size="lg"></app-score-badge>
+        </div>
+      </div>
+
+      <div class="space-y-5">
+        <div>
+          <h1 class="text-3xl font-extrabold tracking-tight">{{ game.nombre }}</h1>
+          <p class="mt-1 text-muted-foreground">{{ game.anio || "Fecha desconocida" }}</p>
+        </div>
+        @if (game.descripcion) {
+          <p class="leading-relaxed text-card-foreground/90">{{ game.descripcion }}</p>
+        }
+        <div class="grid grid-cols-2 gap-4">
+          <ng-container *ngTemplateOutlet="infoRow; context: { label: 'Géneros', values: game.generos }"></ng-container>
+          <ng-container *ngTemplateOutlet="infoRow; context: { label: 'Plataformas', values: game.plataformas }"></ng-container>
+          <ng-container *ngTemplateOutlet="infoRow; context: { label: 'Desarrolladores', values: game.developers }"></ng-container>
+          <ng-container *ngTemplateOutlet="infoRow; context: { label: 'Modos de juego', values: game.modos_de_juego }"></ng-container>
+          <ng-container *ngTemplateOutlet="infoRow; context: { label: 'Temas', values: game.temas }"></ng-container>
+        </div>
+      </div>
+    </div>
+
+    <section class="mt-10">
+      <h2 class="mb-4 flex items-center gap-2 text-2xl font-bold">
+        <lucide-icon name="star" class="h-5 w-5 text-[var(--pink)]"></lucide-icon> Reseñas
+      </h2>
+
+      @if (user) {
+        @if (!myReview && !editingReview) {
+          <div class="mb-6">
+            <ng-container *ngTemplateOutlet="reviewForm; context: { existing: null }"></ng-container>
+          </div>
+        }
+      } @else {
+        <div class="mb-6 rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
+          <a routerLink="/login" class="font-medium text-primary hover:underline">Inicia sesión</a> para publicar tu reseña.
+        </div>
+      }
+
+      @if (commentsLoading) {
+        <div class="space-y-3">
+          <div class="h-24 rounded-xl bg-muted animate-pulse"></div>
+          <div class="h-24 rounded-xl bg-muted animate-pulse"></div>
+        </div>
+      } @else if (comments.length > 0) {
+        <div class="space-y-3">
+          @for (review of comments; track review._id) {
+            @if (editingReview && editingReview._id === review._id) {
+              <ng-container *ngTemplateOutlet="reviewForm; context: { existing: review }"></ng-container>
+            } @else {
+              <div 
+                class="rounded-xl border bg-card p-4"
+                [style.borderColor]="review.role_at_creation === 'Critic' ? 'var(--pink)' : 'var(--border)'"
+                [style.boxShadow]="review.role_at_creation === 'Critic' ? 'var(--shadow-glow)' : 'none'"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div class="flex items-center gap-3">
+                    <app-score-badge [score]="review.score" [variant]="review.role_at_creation === 'Critic' ? 'critic' : 'user'" size="sm"></app-score-badge>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-semibold">{{ review.user_na }}</span>
+                        @if (review.role_at_creation === 'Critic') {
+                          <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold gap-1 bg-gradient-brand text-white border-transparent">
+                            <lucide-icon name="award" class="h-3 w-3"></lucide-icon> Crítico
+                          </div>
+                        }
+                      </div>
+                      <span class="text-xs text-muted-foreground">{{ review.createdAt | date }}</span>
+                    </div>
+                  </div>
+                  @if (user?.user_id === review.user_id) {
+                    <div class="flex gap-1">
+                      <button (click)="editingReview = review; formScore = review.score.toString(); formComment = review.comment" class="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground border-none bg-transparent">
+                        <lucide-icon name="pencil" class="h-4 w-4"></lucide-icon>
+                      </button>
+                      <button (click)="deleteReview(review._id)" class="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground border-none bg-transparent text-destructive">
+                        <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
+                      </button>
+                    </div>
+                  }
+                </div>
+                <p class="mt-3 whitespace-pre-wrap text-sm text-card-foreground/90">{{ review.comment }}</p>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <p class="rounded-xl border border-border bg-card p-6 text-center text-muted-foreground">
+          Aún no hay reseñas. ¡Sé el primero!
+        </p>
+      }
+    </section>
+  }
+</div>
+
+<ng-template #infoRow let-label="label" let-values="values">
+  @if (values && values.length > 0) {
+    <div>
+      <h4 class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{{ label }}</h4>
+      <div class="mt-1 flex flex-wrap gap-1.5">
+        @for (v of values; track v) {
+          <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80">
+            {{ v }}
+          </div>
+        }
+      </div>
+    </div>
+  }
+</ng-template>
+
+<ng-template #reviewForm let-existing="existing">
+  <form (submit)="$event.preventDefault(); submitReview(existing)" class="space-y-4 rounded-xl border border-border bg-card p-4">
+    <div>
+      <div class="mb-2 flex items-center justify-between">
+        <label class="text-sm font-medium">Tu puntaje</label>
+        <span class="text-lg font-bold text-primary">{{ (formScore | number:'1.1-1') || '8.0' }}</span>
+      </div>
+      <input
+        type="range"
+        min="0"
+        max="10"
+        step="0.5"
+        [(ngModel)]="formScore"
+        name="score"
+        class="w-full accent-[var(--pink)]"
+      />
+    </div>
+    <textarea
+      [(ngModel)]="formComment"
+      name="comment"
+      placeholder="Comparte tu opinión sobre el juego..."
+      maxlength="1024"
+      rows="4"
+      class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+    ></textarea>
+    <div class="flex gap-2">
+      <button
+        type="submit"
+        [disabled]="isSubmitting"
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:opacity-90 h-9 px-4 py-2 bg-gradient-brand text-white border-none disabled:opacity-50"
+      >
+        {{ existing ? 'Guardar cambios' : 'Publicar reseña' }}
+      </button>
+      @if (existing) {
+        <button
+          type="button"
+          (click)="editingReview = null; formScore = '8.0'; formComment = ''"
+          class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 border-none bg-transparent"
+        >
+          Cancelar
+        </button>
+      }
+    </div>
+  </form>
+</ng-template>

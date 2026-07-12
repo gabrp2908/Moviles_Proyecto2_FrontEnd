@@ -1,0 +1,143 @@
+<div class="mx-auto max-w-6xl px-4 py-8">
+  <section class="mb-8 overflow-hidden rounded-2xl border border-border bg-card p-8">
+    <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">
+      Encuentra tu próximo <span class="text-primary">juego favorito</span>
+    </h1>
+    <p class="mt-2 max-w-xl text-muted-foreground">
+      Explora, califica y reseña videojuegos. Compara puntajes de la comunidad y de los críticos.
+    </p>
+  </section>
+
+  <div class="mb-6 space-y-4">
+    <div class="flex gap-2">
+      <div class="relative flex-1">
+        <lucide-icon name="search" class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"></lucide-icon>
+        <input
+          type="text"
+          [(ngModel)]="search"
+          (ngModelChange)="onSearchChange()"
+          placeholder="Buscar por nombre..."
+          class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 pl-9"
+        />
+      </div>
+      <button
+        (click)="showFilters = !showFilters"
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+        [class.bg-accent]="showFilters"
+      >
+        <lucide-icon name="sliders-horizontal" class="h-4 w-4 sm:mr-2"></lucide-icon>
+        <span class="hidden sm:inline">Filtros</span>
+      </button>
+      <button
+        type="button"
+        (click)="toggleSortOrder()"
+        class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+      >
+        <lucide-icon name="arrow-up-down" class="h-4 w-4 sm:mr-2"></lucide-icon>
+        <span class="hidden sm:inline">{{ sortOrder === 'asc' ? 'Ascendente' : 'Descendente' }}</span>
+      </button>
+    </div>
+
+    @if (showFilters) {
+      <div class="grid grid-cols-1 gap-3 rounded-xl border border-border bg-card p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-muted-foreground">Género</label>
+          <select 
+            [(ngModel)]="genre" 
+            (ngModelChange)="onFilterChange()"
+            class="form-select"
+          >
+            <option value="all">Todos</option>
+            @for (g of GENRES; track g) {
+              <option [value]="g">{{ g }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-muted-foreground">Plataforma</label>
+          <input
+            type="text"
+            [(ngModel)]="platform"
+            (ngModelChange)="onFilterChange()"
+            placeholder="PC, PlayStation 5..."
+            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          />
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-muted-foreground">Año</label>
+          <input
+            type="number"
+            [(ngModel)]="year"
+            (ngModelChange)="onFilterChange()"
+            placeholder="2023"
+            class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          />
+        </div>
+        <div class="flex items-end">
+          @if (hasActiveFilters) {
+            <button (click)="clearFilters()" class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 w-full text-foreground bg-transparent border-none">
+              <lucide-icon name="x" class="mr-1 h-4 w-4"></lucide-icon> Limpiar
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="flex flex-wrap items-center gap-2">
+      <span class="text-sm text-muted-foreground">Ordenar por:</span>
+      <div class="select-wrapper w-[170px]">
+        <select 
+          [(ngModel)]="sortBy" 
+          (ngModelChange)="onFilterChange()"
+          class="form-select w-full h-10"
+        >
+          <option value="name">Nombre</option>
+          <option value="year">Fecha</option>
+          <option value="userScore">Puntaje usuarios</option>
+          <option value="criticScore">Puntaje críticos</option>
+        </select>
+      </div>
+    </div>
+
+  @if (isError) {
+    <div class="rounded-xl border border-destructive/40 bg-destructive/10 p-6 text-center text-destructive">
+      {{ errorMsg }}
+    </div>
+  }
+
+  @if (isLoading) {
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      @for (i of [1,2,3,4,5,6,7,8,9,10]; track i) {
+        <div class="aspect-[3/4] rounded-xl bg-muted animate-pulse"></div>
+      }
+    </div>
+  } @else if (data && data.length > 0) {
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5" [class.opacity-60]="isFetching">
+      @for (game of data; track game.igdb_id) {
+        <app-game-card [game]="game"></app-game-card>
+      }
+    </div>
+  } @else if (!isError) {
+    <div class="rounded-xl border border-border bg-card p-12 text-center text-muted-foreground">
+      No se encontraron juegos con esos criterios.
+    </div>
+  }
+
+  <div class="mt-8 flex items-center justify-center gap-4">
+    <button
+      class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 disabled:opacity-50 disabled:pointer-events-none"
+      [disabled]="page <= 1 || isFetching"
+      (click)="prevPage()"
+    >
+      <lucide-icon name="chevron-left" class="h-4 w-4"></lucide-icon> Anterior
+    </button>
+    <span class="text-sm text-muted-foreground">Página {{ page }}</span>
+    <button
+      class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 disabled:opacity-50 disabled:pointer-events-none"
+      [disabled]="!data || data.length < 20 || isFetching"
+      (click)="nextPage()"
+    >
+      Siguiente <lucide-icon name="chevron-right" class="h-4 w-4"></lucide-icon>
+    </button>
+  </div>
+</div>
