@@ -23,6 +23,12 @@ export class RegisterComponent {
   async onSubmit() {
     this.isLoading = true;
     this.error = '';
+
+    if (!this.password.trim()) {
+      this.error = 'La contraseña no puede ser solo espacios en blanco.';
+      this.isLoading = false;
+      return;
+    }
     
     try {
       await this.auth.register({ name: this.name, email: this.email, password: this.password });

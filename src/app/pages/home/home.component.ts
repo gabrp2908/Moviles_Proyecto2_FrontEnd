@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LucideAngularModule } from 'lucide-angular';
 import { Subject, debounceTime } from 'rxjs';
+import { ViewWillEnter } from '@ionic/angular';
 import { GamesService } from '../../core/services/games.service';
 import { GameListItem, GameFilters, SortBy, SortOrder } from '../../core/models/types';
 import { GameCardComponent } from '../../components/game-card/game-card.component';
@@ -13,23 +14,12 @@ import { GameCardComponent } from '../../components/game-card/game-card.componen
   imports: [CommonModule, FormsModule, LucideAngularModule, GameCardComponent],
   templateUrl: './home.component.html'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, ViewWillEnter {
   private gamesService = inject(GamesService);
 
-  readonly GENRES = [
-    { value: 'Fighting,Shooter,Hack and slash/Beat \'em up', label: 'Acción' },
-    { value: 'Adventure', label: 'Aventura' },
-    { value: 'Role-playing (RPG)', label: 'RPG' },
-    { value: 'Shooter', label: 'Shooter' },
-    { value: 'Strategy,Real Time Strategy (RTS),Turn-based strategy (TBS)', label: 'Estrategia' },
-    { value: 'Sport', label: 'Deportes' },
-    { value: 'Simulator', label: 'Simulador' },
-    { value: 'Puzzle', label: 'Puzzle' },
-    { value: 'Indie', label: 'Indie' },
-  ];
 
   search = "";
-  genre = "all";
+  genre = "";
   year = "";
   platform = "";
   sortBy: SortBy = "name";
@@ -46,7 +36,7 @@ export class HomeComponent implements OnInit {
   private searchSubject = new Subject<string>();
 
   get hasActiveFilters(): boolean {
-    return this.genre !== "all" || !!this.year || !!this.platform || !!this.search;
+    return !!this.genre || !!this.year || !!this.platform || !!this.search;
   }
 
   ngOnInit() {
@@ -55,6 +45,11 @@ export class HomeComponent implements OnInit {
       this.loadGames();
     });
     this.loadGames();
+  }
+
+  ionViewWillEnter() {
+    // Quitar panel de filtros al regresar de un detalle de juego
+    this.showFilters = false;
   }
 
   onSearchChange() {
@@ -73,7 +68,7 @@ export class HomeComponent implements OnInit {
 
   clearFilters() {
     this.search = "";
-    this.genre = "all";
+    this.genre = "";
     this.year = "";
     this.platform = "";
     this.onFilterChange();
@@ -81,11 +76,13 @@ export class HomeComponent implements OnInit {
 
   prevPage() {
     this.page = Math.max(1, this.page - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loadGames();
   }
 
   nextPage() {
     this.page++;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
     this.loadGames();
   }
 
@@ -96,18 +93,13 @@ export class HomeComponent implements OnInit {
     this.isFetching = true;
     this.isError = false;
 
-    let searchPlatform = this.platform || undefined;
-    if (searchPlatform && searchPlatform.toLowerCase().trim() === 'pc') {
-      searchPlatform = 'PC (Microsoft Windows)';
-    }
-
     const filters: GameFilters = {
       page: this.page,
       limit: 20,
       search: this.search || undefined,
-      genre: this.genre !== "all" ? this.genre : undefined,
+      genre: this.genre || undefined,
       year: this.year ? Number(this.year) : undefined,
-      platform: searchPlatform,
+      platform: this.platform || undefined,
       sortBy: this.sortBy,
       sortOrder: this.sortOrder,
     };

@@ -50,7 +50,7 @@
 
       <button
         type="submit"
-        [disabled]="isLoading || !email || !password || !name"
+        [disabled]="isLoading || !email || !password.trim() || !name"
         class="w-full rounded-md bg-gradient-brand px-4 py-2 text-sm font-medium text-white shadow hover:opacity-90 disabled:opacity-50 border-none"
       >
         {{ isLoading ? 'Creando cuenta...' : 'Registrarse' }}
