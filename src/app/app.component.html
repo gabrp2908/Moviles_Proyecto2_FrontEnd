@@ -1,6 +1,12 @@
 <ion-app>
   <app-navbar></app-navbar>
   <ion-content>
+    <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+      <ion-refresher-content
+        pullingText="Desliza para refrescar"
+        refreshingText="Actualizando..."
+      ></ion-refresher-content>
+    </ion-refresher>
     <router-outlet></router-outlet>
   </ion-content>
 </ion-app>

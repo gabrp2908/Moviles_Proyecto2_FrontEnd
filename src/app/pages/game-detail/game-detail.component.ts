@@ -109,6 +109,15 @@ export class GameDetailComponent implements OnInit {
     return this.user?.role === 'Admin';
   }
 
+  getDisplayName(value: string | null | undefined, maxLength = 18): string {
+    if (!value) {
+      return '';
+    }
+
+    const trimmed = value.slice(0, maxLength).replace(/\s+$/g, '');
+    return value.length > maxLength ? `${trimmed}…` : value;
+  }
+
   ngOnInit() {
     this.auth.user$.subscribe(user => this.user = user);
 

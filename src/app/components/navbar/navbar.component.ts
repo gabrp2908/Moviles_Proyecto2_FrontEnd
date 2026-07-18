@@ -30,6 +30,15 @@ export class NavbarComponent implements OnInit {
     });
   }
 
+  getDisplayName(value: string | null | undefined, maxLength = 16): string {
+    if (!value) {
+      return '';
+    }
+
+    const trimmed = value.slice(0, maxLength).replace(/\s+$/g, '');
+    return value.length > maxLength ? `${trimmed}…` : value;
+  }
+
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
   }

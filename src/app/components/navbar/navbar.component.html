@@ -1,4 +1,4 @@
-<header class="sticky top-0 z-40 border-b border-white/10 bg-black/50 backdrop-blur-xl">
+<header class="sticky top-0 z-40 border-b border-white/10 bg-black/50 pt-3 backdrop-blur-xl sm:pt-4">
   <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
     <a routerLink="/" class="flex items-center gap-2 no-underline">
       <img
@@ -25,13 +25,13 @@
             class="flex items-center gap-1 px-3 py-1.5 text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded-md"
           >
             <lucide-icon name="user" class="h-4 w-4"></lucide-icon>
-            {{ user.user_na }}
+            <span class="max-w-[120px] truncate inline-block align-middle" [title]="user.user_na">{{ getDisplayName(user.user_na) }}</span>
           </button>
           
           @if (isMenuOpen) {
             <div class="absolute right-0 top-full mt-2 w-48 rounded-md border border-border bg-popover p-1 shadow-md text-popover-foreground">
               <div class="flex flex-col px-2 py-1.5">
-                <span class="text-sm font-medium">{{ user.user_mail }}</span>
+                <span class="text-sm font-medium truncate max-w-[170px] block" [title]="user.user_mail">{{ user.user_mail }}</span>
                 <span class="text-xs text-muted-foreground">Rol: {{ user.role }}</span>
               </div>
               <div class="h-px bg-border my-1"></div>

@@ -132,7 +132,7 @@
                     <app-score-badge [score]="myReview.score" [variant]="myReview.role_at_creation === 'Critic' ? 'critic' : 'user'" size="sm"></app-score-badge>
                     <div>
                       <div class="flex items-center gap-2">
-                        <span class="font-semibold">{{ myReview.user_na }}</span>
+                        <span class="max-w-[140px] truncate font-semibold" [title]="myReview.user_na">{{ getDisplayName(myReview.user_na) }}</span>
                         <span class="rounded-full bg-primary/20 px-2 py-0.5 text-xs font-semibold text-primary">Tu reseña</span>
                         @if (myReview.role_at_creation === 'Critic') {
                           <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold gap-1 bg-gradient-brand text-white border-transparent">
@@ -143,23 +143,22 @@
                       <span class="text-xs text-muted-foreground">{{ myReview.createdAt | date }}</span>
                     </div>
                   </div>
-                  <!-- Edit & Delete buttons -->
-                  <div class="flex gap-2">
-                    <button
-                      (click)="editingReview = myReview; formScore = myReview.score.toString(); formComment = myReview.comment"
-                      class="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent cursor-pointer bg-transparent"
-                    >
-                      <lucide-icon name="pencil" class="h-3.5 w-3.5"></lucide-icon> Editar
-                    </button>
-                    <button
-                      (click)="deleteReview(myReview._id)"
-                      class="inline-flex items-center gap-1 rounded-md border border-destructive/40 px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 cursor-pointer bg-transparent"
-                    >
-                      <lucide-icon name="trash-2" class="h-3.5 w-3.5"></lucide-icon> Eliminar
-                    </button>
-                  </div>
                 </div>
                 <p class="mt-3 whitespace-pre-wrap text-sm text-card-foreground/90">{{ myReview.comment }}</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                  <button
+                    (click)="editingReview = myReview; formScore = myReview.score.toString(); formComment = myReview.comment"
+                    class="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-accent cursor-pointer bg-transparent"
+                  >
+                    <lucide-icon name="pencil" class="h-3.5 w-3.5"></lucide-icon> Editar
+                  </button>
+                  <button
+                    (click)="deleteReview(myReview._id)"
+                    class="inline-flex items-center gap-1 rounded-md border border-destructive/40 px-3 py-1.5 text-xs font-medium text-destructive hover:bg-destructive/10 cursor-pointer bg-transparent"
+                  >
+                    <lucide-icon name="trash-2" class="h-3.5 w-3.5"></lucide-icon> Eliminar
+                  </button>
+                </div>
               </div>
             }
           } @else {
@@ -194,7 +193,7 @@
                     <app-score-badge [score]="review.score" [variant]="review.role_at_creation === 'Critic' ? 'critic' : 'user'" size="sm"></app-score-badge>
                     <div>
                       <div class="flex items-center gap-2">
-                        <span class="font-semibold">{{ review.user_na }}</span>
+                        <span class="max-w-[140px] truncate font-semibold" [title]="review.user_na">{{ getDisplayName(review.user_na) }}</span>
                         @if (review.role_at_creation === 'Critic') {
                           <div class="inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold gap-1 bg-gradient-brand text-white border-transparent">
                             <lucide-icon name="award" class="h-3 w-3"></lucide-icon> Crítico
@@ -204,14 +203,15 @@
                       <span class="text-xs text-muted-foreground">{{ review.createdAt | date }}</span>
                     </div>
                   </div>
-                  <!-- Admin delete for other users' reviews -->
-                  @if (isAdmin) {
+                </div>
+                <p class="mt-3 whitespace-pre-wrap text-sm text-card-foreground/90">{{ review.comment }}</p>
+                @if (isAdmin) {
+                  <div class="mt-3">
                     <button (click)="deleteReview(review._id)" class="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium hover:bg-accent hover:text-accent-foreground border-none bg-transparent text-destructive cursor-pointer">
                       <lucide-icon name="trash-2" class="h-4 w-4"></lucide-icon>
                     </button>
-                  }
-                </div>
-                <p class="mt-3 whitespace-pre-wrap text-sm text-card-foreground/90">{{ review.comment }}</p>
+                  </div>
+                }
               </div>
             }
           }

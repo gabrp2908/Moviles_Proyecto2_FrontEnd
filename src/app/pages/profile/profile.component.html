@@ -68,11 +68,11 @@
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-muted-foreground">Nombre</label>
-            <p class="mt-1 text-lg">{{ user?.user_na }}</p>
+            <p class="mt-1 truncate text-lg" [title]="user?.user_na || ''">{{ user?.user_na }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-muted-foreground">Correo electrónico</label>
-            <p class="mt-1 text-lg">{{ user?.user_mail }}</p>
+            <p class="mt-1 truncate text-lg" [title]="user?.user_mail || ''">{{ user?.user_mail }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-muted-foreground">Rol actual</label>
