@@ -14,7 +14,8 @@ export class GamesService {
     let params = new HttpParams();
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params = params.set(key, String(value));
+        const mappedKey = key === 'genre' ? 'genres' : (key === 'platform' ? 'platforms' : key);
+        params = params.set(mappedKey, String(value));
       }
     });
 

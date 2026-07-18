@@ -17,8 +17,15 @@ export class HomeComponent implements OnInit {
   private gamesService = inject(GamesService);
 
   readonly GENRES = [
-    "Acción", "Aventura", "RPG", "Shooter", "Estrategia",
-    "Deportes", "Misterio", "Drama", "Puzzle", "Indie",
+    { value: 'Fighting,Shooter,Hack and slash/Beat \'em up', label: 'Acción' },
+    { value: 'Adventure', label: 'Aventura' },
+    { value: 'Role-playing (RPG)', label: 'RPG' },
+    { value: 'Shooter', label: 'Shooter' },
+    { value: 'Strategy,Real Time Strategy (RTS),Turn-based strategy (TBS)', label: 'Estrategia' },
+    { value: 'Sport', label: 'Deportes' },
+    { value: 'Simulator', label: 'Simulador' },
+    { value: 'Puzzle', label: 'Puzzle' },
+    { value: 'Indie', label: 'Indie' },
   ];
 
   search = "";
@@ -89,13 +96,18 @@ export class HomeComponent implements OnInit {
     this.isFetching = true;
     this.isError = false;
 
+    let searchPlatform = this.platform || undefined;
+    if (searchPlatform && searchPlatform.toLowerCase().trim() === 'pc') {
+      searchPlatform = 'PC (Microsoft Windows)';
+    }
+
     const filters: GameFilters = {
       page: this.page,
       limit: 20,
       search: this.search || undefined,
       genre: this.genre !== "all" ? this.genre : undefined,
       year: this.year ? Number(this.year) : undefined,
-      platform: this.platform || undefined,
+      platform: searchPlatform,
       sortBy: this.sortBy,
       sortOrder: this.sortOrder,
     };

@@ -8,9 +8,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
   return from(authService.getTokenAsync()).pipe(
     switchMap(token => {
-      let authReq = req;
+      let authReq = req.clone({ withCredentials: true });
       if (token) {
         authReq = req.clone({
+          withCredentials: true,
           setHeaders: {
             Authorization: `Bearer ${token}`
           }
@@ -19,7 +20,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
       return next(authReq).pipe(
         catchError((error: HttpErrorResponse) => {
-          if (error.status === 401) {
+          // Only auto-logout on 401 if NOT on an auth endpoint (login, register, etc.)
+          const isAuthEndpoint = req.url.includes('/auth/');
+          if (error.status === 401 && !isAuthEndpoint) {
             authService.logout();
           }
           return throwError(() => error);

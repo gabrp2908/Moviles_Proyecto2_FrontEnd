@@ -48,8 +48,8 @@
             class="form-select"
           >
             <option value="all">Todos</option>
-            @for (g of GENRES; track g) {
-              <option [value]="g">{{ g }}</option>
+            @for (g of GENRES; track g.value) {
+              <option [value]="g.value">{{ g.label }}</option>
             }
           </select>
         </div>

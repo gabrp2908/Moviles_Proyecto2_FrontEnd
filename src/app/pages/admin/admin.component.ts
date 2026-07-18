@@ -16,7 +16,7 @@ export class AdminComponent {
 
   searchEmail = '';
   foundUser: User | null = null;
-  selectedRole: UserRole = 'User';
+  selectedRole: 'User' | 'Critic' = 'User';
   
   isSearching = false;
   isUpdating = false;
@@ -32,7 +32,7 @@ export class AdminComponent {
 
     try {
       this.foundUser = await this.usersService.searchUser(this.searchEmail);
-      this.selectedRole = this.foundUser.role;
+      this.selectedRole = (this.foundUser.role === 'Critic' ? 'Critic' : 'User');
     } catch (e: any) {
       this.error = e.error?.message || e.message || 'Usuario no encontrado';
     } finally {
@@ -48,9 +48,9 @@ export class AdminComponent {
     this.successMessage = '';
 
     try {
-      const updatedUser = await this.usersService.changeRole(this.foundUser.user_id, this.selectedRole);
+      const updatedUser = await this.usersService.changeRole(this.foundUser.user_id, this.selectedRole as UserRole);
       this.foundUser = updatedUser;
-      this.selectedRole = updatedUser.role;
+      this.selectedRole = (updatedUser.role === 'Critic' ? 'Critic' : 'User');
       this.successMessage = 'Rol actualizado exitosamente';
     } catch (e: any) {
       this.error = e.error?.message || e.message || 'Error al actualizar el rol';
